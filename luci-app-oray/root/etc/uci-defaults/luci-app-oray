@@ -1,0 +1,14 @@
+#!/bin/sh
+[ -n "${IPKG_INSTROOT}" ] || {
+	uci delete ucitrack.@oray[-1] >/dev/null 2>&1
+	uci add ucitrack oray
+	uci set ucitrack.@oray[-1].init=oray
+	uci commit ucitrack
+	rm /var/luci-indexcache >/dev/null 2>&1
+	/etc/init.d/oray enable
+	/etc/init.d/cron enable
+	/etc/init.d/cron restart
+}
+
+rm -f /tmp/luci-indexcache
+exit 0

@@ -1,0 +1,10 @@
+
+config oray 'config'
+        option restart_interval '10'
+        option enabled '0'
+
+config service 'mydns'
+        option hostname 'host.vicp.net'
+        option username 'user'
+        option password 'pass'
+        option network 'wan'

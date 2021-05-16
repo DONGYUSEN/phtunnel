@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org
+
+START=91
+
+start() {
+        enabled=$(uci get oray.config.enabled)
+        interval=$(uci get oray.config.restart_interval)
+
+if [ "$enabled" = 1 ]; then
+	/etc/hotplug.d/iface/31-oray update &
+	sed -i '/oray/d' /etc/crontabs/root
+	[ ! "$(cat /etc/crontabs/root |grep "*/$interval * * * * /etc/init.d/oray start")" ] && echo "*/$interval * * * * /etc/init.d/oray start" >>/etc/crontabs/root
+else
+	sed -i '/oray/d' /etc/crontabs/root
+fi
+}
+
+restart() {
+	/etc/init.d/oray start
+}
+

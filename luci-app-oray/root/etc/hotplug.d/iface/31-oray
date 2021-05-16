@@ -1,0 +1,48 @@
+#!/bin/ash
+# by sutuo  http://openwrt.8800.org:82
+
+if [ "$ACTION" = "ifup" ]
+then
+
+#  n=$(uci show oray|grep oray.\@service|grep =service|wc -l)
+   n=$(uci show oray|grep oray|grep =service|wc -l)
+  for i in $( seq 0 $n )
+  do
+    if [ "$INTERFACE" == $(uci get oray.@service[$i].network) ];
+    then
+      if [ $(uci get oray.@service[$i].enabled) == "1" ];
+      then
+          username=$(uci get oray.@service[$i].username -q)
+          password=$(uci get oray.@service[$i].password -q)
+          hostname=$(uci get oray.@service[$i].hostname -q)
+	   network=$(uci get oray.@service[$i].network -q)
+          ipaddr=$(uci -P /var/state get network.$network.ipaddr  -q)
+          url=http://${username}:${password}@ddns.oray.com/ph/update?hostname=${hostname}\&myip=$ipaddr
+          echo wget -q -O- $url	     
+          wget -q -O- $url  
+        fi
+      fi
+  done
+fi
+
+
+if [ $1 = "update" ] 
+then
+  #n=$(uci show oray|grep oray.\@service|grep =service|wc -l)
+  n=$(uci show oray|grep oray|grep =service|wc -l)
+  n=`expr $n - 1`
+  for i in $( seq 0 $n )
+  do
+    if [ $(uci get oray.@service[$i].enabled -q) == "1" ];
+    then
+        username=$(uci get oray.@service[$i].username -q)
+        password=$(uci get oray.@service[$i].password -q)
+        hostname=$(uci get oray.@service[$i].hostname -q)
+	 network=$(uci get oray.@service[$i].network -q)
+        ipaddr=$(uci -P /var/state get network.$network.ipaddr -q)
+	 url=http://${username}:${password}@ddns.oray.com/ph/update?hostname=${hostname}\&myip=$ipaddr
+	 #echo wget -q -O- $url
+	 wget -q -O- $url
+    fi
+  done
+fi
